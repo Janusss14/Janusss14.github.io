@@ -52,6 +52,11 @@ function generateFood() {
 document.addEventListener("keydown", handleInput);
 
 function handleInput(event) {
+  // Prevent default scroll behavior for arrow keys
+  if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", " "].includes(event.key)) {
+    event.preventDefault();
+  }
+
   const key = event.key.toUpperCase();
   
   // Arrow keys
@@ -68,7 +73,6 @@ function handleInput(event) {
   
   // Spacebar for pause
   else if (event.code === "Space") {
-    event.preventDefault();
     togglePause();
   }
 }
