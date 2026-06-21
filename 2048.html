@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2048 - Game</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+      font-size: 48px;
+      color: #22c55e;
+    }
+
+    .info {
+      margin-bottom: 30px;
+      color: #cbd5e1;
+    }
+
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+
+    .stat-box {
+      background: rgba(34, 197, 94, 0.1);
+      border: 2px solid rgba(34, 197, 94, 0.3);
+      padding: 20px 30px;
+      border-radius: 10px;
+      min-width: 150px;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 5px;
+    }
+
+    .stat-value {
+      font-size: 32px;
+      font-weight: bold;
+      color: #22c55e;
+    }
+
+    #gameBoard {
+      width: 340px;
+      height: 340px;
+      background: rgba(30, 41, 59, 0.9);
+      border: 3px solid #22c55e;
+      border-radius: 10px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      padding: 10px;
+      margin: 0 auto 30px;
+      box-shadow: 0 10px 40px rgba(34, 197, 94, 0.2);
+    }
+
+    .tile {
+      background: rgba(100, 116, 139, 0.5);
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      font-weight: bold;
+      color: white;
+      transition: all 0.15s ease-in-out;
+    }
+
+    .tile.new {
+      animation: pop 0.15s ease-in-out;
+    }
+
+    @keyframes pop {
+      0% {
+        transform: scale(0.5);
+        opacity: 0;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    .tile[data-value="2"] { background: #cbd5e1; color: #0f172a; }
+    .tile[data-value="4"] { background: #bfdbfe; color: #0f172a; }
+    .tile[data-value="8"] { background: #93c5fd; color: white; }
+    .tile[data-value="16"] { background: #60a5fa; color: white; }
+    .tile[data-value="32"] { background: #3b82f6; color: white; }
+    .tile[data-value="64"] { background: #2563eb; color: white; }
+    .tile[data-value="128"] { background: #1d4ed8; color: white; font-size: 28px; }
+    .tile[data-value="256"] { background: #1e40af; color: white; font-size: 28px; }
+    .tile[data-value="512"] { background: #193098; color: white; font-size: 28px; }
+    .tile[data-value="1024"] { background: #182d7a; color: white; font-size: 24px; }
+    .tile[data-value="2048"] { background: #22c55e; color: #0f172a; font-weight: bold; }
+
+    .buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    button {
+      padding: 12px 30px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .btn-primary {
+      background: #22c55e;
+      color: #0f172a;
+      border: 2px solid #22c55e;
+    }
+
+    .btn-primary:hover {
+      background: #10b981;
+      border-color: #10b981;
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: #22c55e;
+      border: 2px solid #22c55e;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(34, 197, 94, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .message {
+      font-size: 20px;
+      margin-top: 20px;
+      height: 30px;
+      color: #fbbf24;
+      font-weight: bold;
+    }
+
+    .back-link {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      color: #22c55e;
+      text-decoration: none;
+      font-size: 18px;
+      transition: all 0.3s;
+    }
+
+    .back-link:hover {
+      color: #10b981;
+      transform: translateX(-5px);
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 36px;
+      }
+
+      #gameBoard {
+        width: 100%;
+        max-width: 300px;
+        height: 300px;
+      }
+
+      .tile {
+        font-size: 24px;
+      }
+
+      .stats {
+        gap: 15px;
+      }
+
+      .stat-box {
+        min-width: 120px;
+        padding: 15px 20px;
+      }
+
+      .stat-value {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a href="index.html" class="back-link">← Terug</a>
+  
+  <div class="container">
+    <h1>🔢 2048</h1>
+    <p class="info">Voeg getallen samen om 2048 te bereiken!</p>
+
+    <div class="stats">
+      <div class="stat-box">
+        <div class="stat-label">Score</div>
+        <div class="stat-value" id="score">0</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Best</div>
+        <div class="stat-value" id="best">0</div>
+      </div>
+    </div>
+
+    <div id="gameBoard"></div>
+
+    <div class="buttons">
+      <button class="btn-primary" onclick="newGame()">Nieuw Spel</button>
+      <button class="btn-secondary" onclick="goBack()">← Terug</button>
+    </div>
+
+    <div class="message" id="message"></div>
+  </div>
+
+  <script>
+    const board = [];
+    let score = 0;
+    let best = localStorage.getItem('2048_best') || 0;
+    const boardSize = 4;
+
+    document.getElementById('best').textContent = best;
+
+    // Keyboard controls
+    document.addEventListener('keydown', (e) => {
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+        e.preventDefault();
+        const direction = e.key.replace('Arrow', '').toLowerCase();
+        move(direction);
+      }
+    });
+
+    function initBoard() {
+      for (let i = 0; i < boardSize; i++) {
+        board[i] = [];
+        for (let j = 0; j < boardSize; j++) {
+          board[i][j] = 0;
+        }
+      }
+      addNewTile();
+      addNewTile();
+      render();
+    }
+
+    function addNewTile() {
+      const empty = [];
+      for (let i = 0; i < boardSize; i++) {
+        for (let j = 0; j < boardSize; j++) {
+          if (board[i][j] === 0) {
+            empty.push({ x: i, y: j });
+          }
+        }
+      }
+      if (empty.length > 0) {
+        const pos = empty[Math.floor(Math.random() * empty.length)];
+        board[pos.x][pos.y] = Math.random() < 0.9 ? 2 : 4;
+      }
+    }
+
+    function render() {
+      const gameBoard = document.getElementById('gameBoard');
+      gameBoard.innerHTML = '';
+      for (let i = 0; i < boardSize; i++) {
+        for (let j = 0; j < boardSize; j++) {
+          const tile = document.createElement('div');
+          tile.className = 'tile';
+          const value = board[i][j];
+          if (value !== 0) {
+            tile.textContent = value;
+            tile.setAttribute('data-value', value);
+          }
+          gameBoard.appendChild(tile);
+        }
+      }
+      document.getElementById('score').textContent = score;
+    }
+
+    function move(direction) {
+      let moved = false;
+      const oldBoard = JSON.parse(JSON.stringify(board));
+
+      if (direction === 'left') {
+        for (let i = 0; i < boardSize; i++) {
+          board[i] = slide(board[i]);
+          board[i] = combine(board[i]);
+          board[i] = slide(board[i]);
+        }
+      } else if (direction === 'right') {
+        for (let i = 0; i < boardSize; i++) {
+          board[i] = board[i].reverse();
+          board[i] = slide(board[i]);
+          board[i] = combine(board[i]);
+          board[i] = slide(board[i]);
+          board[i] = board[i].reverse();
+        }
+      } else if (direction === 'up') {
+        for (let j = 0; j < boardSize; j++) {
+          const col = [];
+          for (let i = 0; i < boardSize; i++) {
+            col.push(board[i][j]);
+          }
+          col = slide(col);
+          col = combine(col);
+          col = slide(col);
+          for (let i = 0; i < boardSize; i++) {
+            board[i][j] = col[i];
+          }
+        }
+      } else if (direction === 'down') {
+        for (let j = 0; j < boardSize; j++) {
+          let col = [];
+          for (let i = boardSize - 1; i >= 0; i--) {
+            col.push(board[i][j]);
+          }
+          col = slide(col);
+          col = combine(col);
+          col = slide(col);
+          for (let i = 0; i < boardSize; i++) {
+            board[boardSize - 1 - i][j] = col[i];
+          }
+        }
+      }
+
+      moved = JSON.stringify(oldBoard) !== JSON.stringify(board);
+      if (moved) {
+        addNewTile();
+        render();
+        checkGameStatus();
+      }
+    }
+
+    function slide(line) {
+      return line.filter(val => val !== 0).concat(Array(boardSize - line.filter(val => val !== 0).length).fill(0));
+    }
+
+    function combine(line) {
+      for (let i = 0; i < line.length - 1; i++) {
+        if (line[i] !== 0 && line[i] === line[i + 1]) {
+          line[i] *= 2;
+          score += line[i];
+          line.splice(i + 1, 1);
+          line.push(0);
+
+          if (line[i] === 2048) {
+            document.getElementById('message').textContent = '🎉 JE HEBT 2048 BEREIKT!';
+          }
+        }
+      }
+      return line;
+    }
+
+    function checkGameStatus() {
+      let hasEmpty = false;
+      for (let i = 0; i < boardSize; i++) {
+        for (let j = 0; j < boardSize; j++) {
+          if (board[i][j] === 0) hasEmpty = true;
+        }
+      }
+
+      if (!hasEmpty) {
+        let canMove = false;
+        for (let i = 0; i < boardSize; i++) {
+          for (let j = 0; j < boardSize - 1; j++) {
+            if (board[i][j] === board[i][j + 1]) canMove = true;
+          }
+        }
+        for (let j = 0; j < boardSize; j++) {
+          for (let i = 0; i < boardSize - 1; i++) {
+            if (board[i][j] === board[i + 1][j]) canMove = true;
+          }
+        }
+
+        if (!canMove) {
+          document.getElementById('message').textContent = '💀 GAME OVER!';
+          if (score > best) {
+            best = score;
+            localStorage.setItem('2048_best', best);
+            document.getElementById('best').textContent = best;
+          }
+        }
+      }
+    }
+
+    function newGame() {
+      board.length = 0;
+      score = 0;
+      document.getElementById('message').textContent = '';
+      initBoard();
+    }
+
+    function goBack() {
+      window.location.href = 'index.html';
+    }
+
+    newGame();
+  </script>
+</body>
+</html>
