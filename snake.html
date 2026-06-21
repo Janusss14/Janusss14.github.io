@@ -2,16 +2,49 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
-  <title>Snake Game</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🐍 Snake Game</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div class="snake-container">
+    <div class="snake-header">
+      <h1>🐍 Snake Game</h1>
+      <p class="subtitle">Eet het voedsel en groei!</p>
+    </div>
 
-  <h1>🐍 Snake</h1>
-  <canvas id="game" width="400" height="400"></canvas>
+    <div class="game-wrapper">
+      <div class="stats-panel">
+        <div class="stat">
+          <span class="stat-label">Score</span>
+          <span class="stat-value" id="score">0</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">High Score</span>
+          <span class="stat-value" id="highScore">0</span>
+        </div>
+      </div>
 
-  <p>Gebruik pijltjestoetsen om te bewegen</p>
-  <a href="index.html">⬅ Terug</a>
+      <canvas id="gameCanvas" width="400" height="400"></canvas>
+
+      <div class="controls">
+        <div class="keyboard-hint">
+          <p>⬆️ ⬅️ ⬇️ ➡️ of <strong>WASD</strong> om te bewegen</p>
+        </div>
+        <div class="button-group">
+          <button id="startBtn" class="btn btn-primary">Start Game</button>
+          <button id="pauseBtn" class="btn btn-secondary" disabled>Pauze</button>
+          <button id="resetBtn" class="btn btn-secondary">Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <p>Probeer zoveel mogelijk voedsel te eten! ❌ Raak jezelf of de muur niet!</p>
+    </div>
+
+    <a href="index.html" class="back-link">⬅️ Terug naar Home</a>
+  </div>
 
   <script src="snake.js"></script>
 </body>
