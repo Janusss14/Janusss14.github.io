@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎯 Pong Game</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .pong-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 30px;
+      max-width: 900px;
+      width: 100%;
+    }
+
+    .pong-header {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .pong-header h1 {
+      font-size: 48px;
+      margin-bottom: 10px;
+      background: linear-gradient(45deg, #fbbf24, #f97316);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 0 0 30px rgba(251, 191, 36, 0.3);
+    }
+
+    .subtitle {
+      font-size: 18px;
+      color: #94a3b8;
+      font-weight: 300;
+    }
+
+    .game-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      width: 100%;
+    }
+
+    .stats-panel {
+      display: flex;
+      gap: 40px;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .stat {
+      background: rgba(15, 23, 42, 0.8);
+      border: 2px solid #fbbf24;
+      border-radius: 12px;
+      padding: 15px 30px;
+      text-align: center;
+      min-width: 150px;
+      box-shadow: 0 0 20px rgba(251, 191, 36, 0.2);
+    }
+
+    .stat-label {
+      display: block;
+      font-size: 12px;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .stat-value {
+      display: block;
+      font-size: 40px;
+      font-weight: bold;
+      color: #fbbf24;
+      text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+    }
+
+    #pongCanvas {
+      border: 3px solid #fbbf24;
+      background: #000;
+      box-shadow: 0 0 30px rgba(251, 191, 36, 0.3);
+      border-radius: 8px;
+      display: block;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+
+    .controls {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      width: 100%;
+    }
+
+    .keyboard-hint {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid #475569;
+      border-radius: 8px;
+      padding: 12px 20px;
+      text-align: center;
+      max-width: 600px;
+    }
+
+    .keyboard-hint p {
+      font-size: 14px;
+      color: #cbd5e1;
+      margin: 0;
+      line-height: 1.8;
+    }
+
+    .keyboard-hint strong {
+      color: #fbbf24;
+      font-weight: 600;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      width: 100%;
+      max-width: 500px;
+    }
+
+    .btn {
+      padding: 12px 28px;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      min-width: 140px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #fbbf24, #f97316);
+      color: #0f172a;
+      box-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 0 30px rgba(251, 191, 36, 0.6);
+    }
+
+    .btn-primary:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    .btn-secondary {
+      background: rgba(30, 41, 59, 0.8);
+      color: #cbd5e1;
+      border: 2px solid #475569;
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      border-color: #fbbf24;
+      color: #fbbf24;
+      background: rgba(30, 41, 59, 1);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .info-box {
+      background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(249, 115, 22, 0.1));
+      border: 1px solid rgba(251, 191, 36, 0.3);
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+      max-width: 600px;
+    }
+
+    .info-box p {
+      margin: 0;
+      color: #cbd5e1;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .back-link {
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      padding: 8px 16px;
+      border-radius: 6px;
+    }
+
+    .back-link:hover {
+      color: #fbbf24;
+      background: rgba(251, 191, 36, 0.1);
+    }
+
+    @media (max-width: 768px) {
+      .pong-header h1 {
+        font-size: 36px;
+      }
+
+      .game-wrapper {
+        gap: 15px;
+      }
+
+      #pongCanvas {
+        max-width: 100%;
+        height: auto;
+      }
+
+      .btn {
+        min-width: 120px;
+        padding: 10px 20px;
+        font-size: 14px;
+      }
+
+      .stats-panel {
+        gap: 20px;
+      }
+
+      .stat {
+        min-width: 120px;
+        padding: 12px 20px;
+      }
+
+      .stat-value {
+        font-size: 32px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="pong-container">
+    <div class="pong-header">
+      <h1>🎯 Pong</h1>
+      <p class="subtitle">Klassieke tafeltennis game!</p>
+    </div>
+
+    <div class="game-wrapper">
+      <div class="stats-panel">
+        <div class="stat">
+          <span class="stat-label">Player 1</span>
+          <span class="stat-value" id="score1">0</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Player 2</span>
+          <span class="stat-value" id="score2">0</span>
+        </div>
+      </div>
+
+      <canvas id="pongCanvas" width="800" height="400"></canvas>
+
+      <div class="controls">
+        <div class="keyboard-hint">
+          <p>
+            <strong>Player 1 (Links):</strong> W / S of <strong>⬆️ / ⬇️</strong><br>
+            <strong>Player 2 (Rechts):</strong> I / K<br>
+            <strong>SPACEBAR</strong> Start/Reset
+          </p>
+        </div>
+        <div class="button-group">
+          <button id="startBtn" class="btn btn-primary">Start Game</button>
+          <button id="pauseBtn" class="btn btn-secondary" disabled>Pauze</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <p>⚫ Beweeg je pallet omhoog en omlaag! Zorg dat de bal er niet voorbij gaat! Eerst tot 11 punten wint!</p>
+    </div>
+
+    <a href="index.html" class="back-link">⬅️ Terug naar Home</a>
+  </div>
+
+  <script src="pong.js"></script>
+</body>
+</html>
