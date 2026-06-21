@@ -64,7 +64,7 @@ let level = 1;
 let highScore = localStorage.getItem("tetrisHighScore") || 0;
 let gameRunning = false;
 let gamePaused = false;
-let gameSpeed = 1000;
+let gameSpeed = 600;
 let gameInterval = null;
 
 // Initialize
@@ -100,7 +100,7 @@ function initGame() {
   score = 0;
   lines = 0;
   level = 1;
-  gameSpeed = 1000;
+  gameSpeed = 600;
   updateStats();
   draw();
 }
@@ -320,7 +320,7 @@ function clearLines() {
     const newLevel = Math.floor(lines / 10) + 1;
     if (newLevel > level) {
       level = newLevel;
-      gameSpeed = Math.max(100, 1000 - (level - 1) * 100);
+      gameSpeed = Math.max(200, 600 - (level - 1) * 80);
       updateGameSpeed();
     }
   }
@@ -332,18 +332,21 @@ document.addEventListener("keydown", handleInput);
 function handleInput(event) {
   if (!gameRunning || gamePaused) return;
 
+  // Prevent default scroll behavior for arrow keys
+  if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", " "].includes(event.key)) {
+    event.preventDefault();
+  }
+
   switch (event.key) {
     case "ArrowLeft":
       if (canMove(currentPiece, -1, 0)) {
         currentPiece.x--;
       }
-      event.preventDefault();
       break;
     case "ArrowRight":
       if (canMove(currentPiece, 1, 0)) {
         currentPiece.x++;
       }
-      event.preventDefault();
       break;
     case "ArrowDown":
       if (canMove(currentPiece, 0, 1)) {
@@ -352,17 +355,9 @@ function handleInput(event) {
       } else {
         placePiece();
       }
-      event.preventDefault();
       break;
-    case "z":
-    case "Z":
+    case "ArrowUp":
       currentPiece = rotatePiece(currentPiece);
-      event.preventDefault();
-      break;
-    case "x":
-    case "X":
-      currentPiece = rotatePiece(currentPiece);
-      event.preventDefault();
       break;
     case " ":
       // Hard drop
@@ -371,7 +366,6 @@ function handleInput(event) {
         score += 2;
       }
       placePiece();
-      event.preventDefault();
       break;
   }
 }
